@@ -20,22 +20,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGuest, onLogin 
   useEffect(() => {
     let isMounted = true;
 
-    const initNewPlacesApi = async () => {
+    const initNewPlacesApi = async (attempts = 3) => {
       // 1. Wait for Google Maps Global
       const waitForGlobal = () => new Promise<void>((resolve) => {
-        if ((window as any).google && (window as any).google.maps) return resolve();
+        // Reduced interval for faster detection
         const i = setInterval(() => {
           if ((window as any).google && (window as any).google.maps) {
             clearInterval(i);
             resolve();
           }
-        }, 100);
+        }, 50);
+
+        // Timeout after 10s to stop infinite wait
+        setTimeout(() => clearInterval(i), 10000);
       });
 
-      await waitForGlobal();
-      if (!isMounted || !autocompleteContainerRef.current) return;
-
       try {
+        await waitForGlobal();
+        if (!isMounted || !autocompleteContainerRef.current) return;
+
+        if (!(window as any).google?.maps) {
+          throw new Error("Google Maps script failed to load.");
+        }
+
         console.log("[System] Importing New Places Library...");
         // 2. Import the specific library
         const { PlaceAutocompleteElement } = await (window as any).google.maps.importLibrary("places");
@@ -58,8 +65,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGuest, onLogin 
           autocompleteContainerRef.current.appendChild(autocomplete);
         }
 
-        // 5. Update State (This triggers React re-render, but won't touch the ref content)
+        // 5. Update State
         setApiReady(true);
+        setError(''); // Clear any previous errors
 
         // Listeners
         autocomplete.addEventListener('gmp-select', async (event: any) => {
@@ -98,8 +106,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGuest, onLogin 
         });
 
       } catch (err) {
-        console.error("Initialization Failed:", err);
-        setError("Map services unavailable.");
+        console.error(`Initialization Attempt Failed (${attempts} left):`, err);
+        if (attempts > 1) {
+          setTimeout(() => initNewPlacesApi(attempts - 1), 1500); // Retry after 1.5s
+        } else {
+          setError("Map services unavailable. Please check your connection.");
+        }
       }
     };
 
@@ -233,7 +245,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGuest, onLogin 
                           */}
                     {!apiReady && (
                       <div className="absolute inset-0 flex items-center text-gray-400 pointer-events-none z-0">
-                        Loading map services...
+                        Loading secure address search...
                       </div>
                     )}
 
