@@ -7,9 +7,10 @@ interface SidebarProps {
   currentView: ViewState;
   onNavigate: (view: ViewState) => void;
   isGuest?: boolean;
+  onSupportClick?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ user, currentView, onNavigate, isGuest = false }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ user, currentView, onNavigate, isGuest = false, onSupportClick }) => {
   const [showDonationModal, setShowDonationModal] = useState(false);
 
   return (
@@ -115,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, currentView, onNavigate,
 
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Support Civic Bridge</h3>
               <p className="text-gray-500 mb-6 leading-relaxed">
-                We are working hard to bring you the best civic advocacy tools. Secure donations will be available soon.
+                Your voice is powerful, and your support amplifies our mission. Help us build the bridge to a more responsive government for every citizen. Secure donation options are landing soon!
               </p>
 
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-[#002e6d] mb-8 text-left">
@@ -123,10 +124,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, currentView, onNavigate,
               </div>
 
               <button
-                onClick={() => setShowDonationModal(false)}
+                onClick={() => {
+                  setShowDonationModal(false);
+                  if (onSupportClick) onSupportClick();
+                }}
                 className="w-full bg-[#002e6d] hover:bg-blue-900 text-white font-bold py-3 rounded-xl transition-colors shadow-lg"
               >
-                Check Back Later
+                Contact Us for Updates
               </button>
             </div>
           </div>

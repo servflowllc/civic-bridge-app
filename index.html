@@ -1,27 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Civic Bridge</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
-    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+    }
+
     /* Animations */
     @keyframes scale-in {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
+
     .animate-scale-in {
       animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    
+
     @keyframes fade-in-up {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
+
     .animate-fade-in-up {
       animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -30,23 +51,40 @@
     ::-webkit-scrollbar {
       width: 8px;
     }
+
     ::-webkit-scrollbar-track {
       background: transparent;
     }
+
     ::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 4px;
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
   </style>
   <!-- Google Maps & Places API (New) - 'v=weekly' is required for PlaceAutocompleteElement -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCpDKK3zruUefBhWmiE4GZhnG2anPYii4&libraries=places&v=weekly&loading=async" async defer></script>
-<link rel="stylesheet" href="/index.css">
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCpDKK3zruUefBhWmiE4GZhnG2anPYii4&libraries=places&v=weekly&loading=async"
+    async defer></script>
+  <link rel="stylesheet" href="/index.css">
 </head>
+
 <body>
   <div id="root"></div>
+
+  <!-- Netlify Form Detection (Hidden) -->
+  <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+    <input type="hidden" name="form-name" value="contact" />
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="text" name="subject" />
+    <textarea name="message"></textarea>
+  </form>
+
   <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>

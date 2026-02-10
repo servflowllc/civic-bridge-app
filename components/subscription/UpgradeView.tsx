@@ -7,13 +7,14 @@ interface UpgradeViewProps {
   user: UserProfile;
   onNavigate: (view: ViewState) => void;
   onUpdateUser?: (user: UserProfile) => void;
+  onJoinWaitlist: () => void;
 }
 
-export const UpgradeView: React.FC<UpgradeViewProps> = ({ user, onNavigate }) => {
+export const UpgradeView: React.FC<UpgradeViewProps> = ({ user, onNavigate, onJoinWaitlist }) => {
 
   return (
     <div className="min-h-screen bg-[#F5F7FA] flex font-sans">
-      <Sidebar user={user} currentView="UPGRADE" onNavigate={onNavigate} isGuest={user.id === 'guest'} />
+      <Sidebar user={user} currentView="UPGRADE" onNavigate={onNavigate} isGuest={user.id === 'guest'} onSupportClick={onJoinWaitlist} />
 
       {/* Mobile Sidebar Placeholder */}
       <div className="w-64 hidden md:block shrink-0"></div>
@@ -54,6 +55,13 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ user, onNavigate }) =>
               </li>
             </ul>
           </div>
+
+          <button
+            onClick={onJoinWaitlist}
+            className="w-full md:w-auto px-8 py-3 bg-[#002e6d] hover:bg-blue-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 mb-8"
+          >
+            Join the Waitlist
+          </button>
 
           <button
             onClick={() => onNavigate('LANDING')}

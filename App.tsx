@@ -17,6 +17,7 @@ import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
 import { TermsOfService } from './components/legal/TermsOfService';
 import { AccessibilityStatement } from './components/legal/AccessibilityStatement';
 import { MOCK_LOGS, MOCK_DOCUMENTS } from './services/mockData';
+import { ContactModal } from './components/common/ContactModal';
 import { fetchRepresentatives } from './services/civicService';
 
 export const App = () => {
@@ -27,6 +28,8 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRep, setSelectedRep] = useState<Representative | null>(null);
   const [showTour, setShowTour] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [contactSubject, setContactSubject] = useState('');
   const [lastActionMethod, setLastActionMethod] = useState<'webform' | 'pdf'>('webform');
   const [loginMessage, setLoginMessage] = useState<string>('');
 
@@ -213,7 +216,10 @@ export const App = () => {
     )
   }
 
-
+  const handleOpenContact = (subject: string = '') => {
+    setContactSubject(subject);
+    setIsContactModalOpen(true);
+  };
 
   return (
     <div className="font-sans text-gray-900 bg-gray-50 min-h-screen flex flex-col">
@@ -281,6 +287,7 @@ export const App = () => {
               logs={logs}
               documents={MOCK_DOCUMENTS}
               onNavigate={handleNavigate}
+              onSupportClick={() => handleOpenContact('Donation Inquiry')}
             />
           )}
 
@@ -290,6 +297,7 @@ export const App = () => {
               onNavigate={handleNavigate}
               onUpdateUser={(u) => setUser(u)}
               onLogout={handleLogout}
+              onSupportClick={() => handleOpenContact('Donation Inquiry')}
             />
           )}
 
@@ -298,6 +306,7 @@ export const App = () => {
               user={user || { id: 'guest', name: 'Guest', email: '', avatar: '', isVerified: false, isPro: false }}
               onNavigate={handleNavigate}
               onUpdateUser={(u) => setUser(u)}
+              onJoinWaitlist={() => handleOpenContact('Join Waitlist')}
             />
           )}
 
@@ -322,6 +331,13 @@ export const App = () => {
           </div>
         )}
       </main>
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        initialSubject={contactSubject}
+        userEmail={user?.email}
+      />
     </div>
   );
 };
