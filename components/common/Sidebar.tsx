@@ -63,19 +63,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, currentView, onNavigate,
           />
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="p-4 m-4 bg-[#002e6d] rounded-2xl text-white shrink-0">
-          <h3 className="font-bold text-sm mb-1">Support Us</h3>
-          <p className="text-[10px] text-blue-200 mb-3 leading-relaxed">
-            Donations coming soon. Please check back later.
-          </p>
-          <button
-            onClick={() => setShowDonationModal(true)}
-            className="w-full bg-white/10 hover:bg-white/20 transition-colors py-2 rounded-lg text-xs font-semibold"
-          >
-            Coming Soon
-          </button>
-        </div>
+        {/* Sidebar Footer - Only visible on Civic+ (Upgrade) page */}
+        {currentView === 'UPGRADE' && (
+          <div className="p-4 m-4 bg-[#002e6d] rounded-2xl text-white shrink-0">
+            <h3 className="font-bold text-sm mb-1">Support Us</h3>
+            <p className="text-[10px] text-blue-200 mb-3 leading-relaxed">
+              Donations coming soon. Please check back later.
+            </p>
+            <button
+              onClick={() => setShowDonationModal(true)}
+              className="w-full bg-white/10 hover:bg-white/20 transition-colors py-2 rounded-lg text-xs font-semibold"
+            >
+              Coming Soon
+            </button>
+          </div>
+        )}
 
         <div className="p-4 border-t border-gray-100 flex items-center gap-3 shrink-0">
           {isGuest ? (

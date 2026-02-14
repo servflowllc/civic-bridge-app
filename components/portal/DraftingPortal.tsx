@@ -247,20 +247,38 @@ export const DraftingPortal: React.FC<PortalProps> = ({ rep, user, isGuest = fal
 
     // --- Header ---
     // 1. Icon (Landmark/Bank) - Red #cc0000
-    doc.setFillColor(204, 0, 0); // #cc0000
+    doc.setDrawColor(204, 0, 0); // #cc0000
+    doc.setLineWidth(0.7); // Roughly matches stroke-width="2" at this scale
+    doc.setLineCap('round');
+    doc.setLineJoin('round');
 
-    // Icon Geometry (Approximation of the Landmark Lucide icon)
+    // Icon Geometry (Matching Lucide 'Landmark' icon)
+    // Original ViewBox 0 0 24 24.
+    // We scale it down. Let's say s = 0.5 => 12mm size.
+    const s = 0.5;
     const iconX = margin;
     const iconY = 15;
 
-    // Roof (Triangle)
-    doc.triangle(iconX, iconY + 4, iconX + 4, iconY, iconX + 8, iconY + 4, 'F');
-    // Base & Columns
-    doc.rect(iconX + 1, iconY + 5, 6, 1, 'F'); // Top trim
-    doc.rect(iconX + 1.5, iconY + 7, 0.8, 3, 'F'); // Column 1
-    doc.rect(iconX + 3.6, iconY + 7, 0.8, 3, 'F'); // Column 2
-    doc.rect(iconX + 5.7, iconY + 7, 0.8, 3, 'F'); // Column 3
-    doc.rect(iconX, iconY + 11, 8, 1, 'F'); // Foundation
+    // Roof (Triangle) points="12 2 20 7 4 7"
+    doc.triangle(
+      iconX + (12 * s), iconY + (2 * s),
+      iconX + (20 * s), iconY + (7 * s),
+      iconX + (4 * s), iconY + (7 * s),
+      'S'
+    );
+
+    // Columns lines: x1, y1, x2, y2
+    // line x1="6" y1="18" x2="6" y2="11"
+    doc.line(iconX + (6 * s), iconY + (18 * s), iconX + (6 * s), iconY + (11 * s));
+    // line x1="10" y1="18" x2="10" y2="11"
+    doc.line(iconX + (10 * s), iconY + (18 * s), iconX + (10 * s), iconY + (11 * s));
+    // line x1="14" y1="18" x2="14" y2="11"
+    doc.line(iconX + (14 * s), iconY + (18 * s), iconX + (14 * s), iconY + (11 * s));
+    // line x1="18" y1="18" x2="18" y2="11"
+    doc.line(iconX + (18 * s), iconY + (18 * s), iconX + (18 * s), iconY + (11 * s));
+
+    // Base line: x1="3" y1="22" x2="21" y2="22"
+    doc.line(iconX + (3 * s), iconY + (22 * s), iconX + (21 * s), iconY + (22 * s));
 
     // 2. Text Branding
     doc.setTextColor(0, 46, 109); // #002e6d (Civic Blue)
