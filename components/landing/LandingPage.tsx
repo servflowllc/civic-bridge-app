@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
+import { loadGoogleMapsScript } from '../../services/googleMapsLoader';
 import { ArrowRight, MapPin, ShieldCheck, Scale, Lock, Globe, Landmark, Star, BookOpen, Info, AlertCircle } from 'lucide-react';
 
 interface LandingPageProps {
@@ -21,27 +22,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGuest, onLogin 
     let isMounted = true;
 
     const initNewPlacesApi = async (attempts = 3) => {
-      // 1. Wait for Google Maps Global
-      const waitForGlobal = () => new Promise<void>((resolve) => {
-        // Reduced interval for faster detection
-        const i = setInterval(() => {
-          if ((window as any).google && (window as any).google.maps) {
-            clearInterval(i);
-            resolve();
-          }
-        }, 50);
-
-        // Timeout after 10s to stop infinite wait
-        setTimeout(() => clearInterval(i), 10000);
-      });
-
       try {
-        await waitForGlobal();
-        if (!isMounted || !autocompleteContainerRef.current) return;
+        await loadGoogleMapsScript();
 
-        if (!(window as any).google?.maps) {
-          throw new Error("Google Maps script failed to load.");
-        }
+        if (!isMounted || !autocompleteContainerRef.current) return;
 
         console.log("[System] Importing New Places Library...");
         // 2. Import the specific library
@@ -120,8 +104,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGuest, onLogin 
     return () => { isMounted = false; };
   }, []);
 
+  const [showStartPrompt, setShowStartPrompt] = useState(false);
+  const promptRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (apiReady && !constructedAddress && !error) {
+      const timer = setTimeout(() => {
+        setShowStartPrompt(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [apiReady, constructedAddress, error]);
+
+  const handleDismissPrompt = () => {
+    setShowStartPrompt(false);
+  };
+
+  // Close prompt if user clicks outside
+  useEffect(() => {
+    if (showStartPrompt) {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (promptRef.current && !promptRef.current.contains(event.target as Node)) {
+          setShowStartPrompt(false);
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showStartPrompt]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setShowStartPrompt(false);
 
     if (!isValidSelection || !constructedAddress) {
       setError("Please select an address from the dropdown suggestions.");
@@ -220,9 +234,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartGuest, onLogin 
 
           {/* Address Input Card */}
           <div className="w-full max-w-2xl mx-auto">
-            <div className="text-left mb-2 ml-1 flex items-center gap-2">
+            <div className="text-left mb-2 ml-1 flex items-center gap-2 relative">
               <span className="w-2 h-2 rounded-full bg-[#cc0000]"></span>
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Step 1: Identify your District</span>
+
+              {/* Start Here Prompt */}
+              {showStartPrompt && (
+                <div ref={promptRef} className="absolute left-0 bottom-full mb-3 z-40 animate-bounce-slow">
+                  <div className="bg-[#002e6d] text-white px-4 py-3 rounded-xl shadow-xl flex items-start gap-3 w-[280px] md:w-[320px] relative">
+                    <div className="absolute -bottom-2 left-6 w-4 h-4 bg-[#002e6d] rotate-45 transform origin-center"></div>
+                    <div className="mt-0.5 shrink-0">
+                      <MapPin size={16} className="text-blue-200" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold mb-1">Start here!</p>
+                      <p className="text-xs text-blue-100 leading-snug">
+                        Start typing your address to find your district representatives and get started.
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleDismissPrompt}
+                      className="text-blue-300 hover:text-white shrink-0 -mt-1 -mr-2 p-1"
+                    >
+                      <span className="sr-only">Dismiss</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSubmit} className="relative group z-30">
